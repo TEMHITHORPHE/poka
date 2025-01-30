@@ -1,5 +1,3 @@
-// use core::ops::Add;
-// use std::process::Output;
 
 #[derive(PartialEq, PartialOrd, Copy, Clone, Debug)]
 pub enum Suit {
@@ -72,7 +70,9 @@ pub enum PokaVariant {
 
 pub type Hand = [Card; 5];
 
-enum HandRank {
+#[repr(u8)]
+#[derive(PartialEq, PartialOrd, Copy, Clone, Debug)]
+pub enum HandRank {
     High,
     Pair,
     TwoPair,
@@ -84,6 +84,23 @@ enum HandRank {
     StraightFlush,
 }
 
-enum HandRankingResult {
-    StraightFlush(),
-}
+// enum HandRankingResult {
+//     StraightFlush(),
+// }
+
+// u8_to_enum: [
+//     Rank::None,
+//     Rank::Deuce,
+//     Rank::Three,
+//     Rank::Four,
+//     Rank::Five,
+//     Rank::Six,
+//     Rank::Seven,
+//     Rank::Eight,
+//     Rank::Nine,
+//     Rank::Ten,
+//     Rank::Jack,
+//     Rank::Queen,
+//     Rank::King,
+//     Rank::Ace,
+// ],

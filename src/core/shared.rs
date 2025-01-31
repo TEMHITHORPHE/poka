@@ -7,7 +7,7 @@ pub enum Suit {
 }
 
 #[repr(u8)]
-#[derive(PartialEq, PartialOrd, Copy, Clone, Debug)]
+#[derive(PartialEq, PartialOrd, Eq, Ord, Copy, Clone, Debug)]
 pub enum Rank {
     None = 0,
     Deuce = 2,
@@ -48,7 +48,7 @@ impl From<u8> for Rank {
 
 #[derive(Debug, Clone, Copy)]
 pub struct Card {
-    suit: Suit,
+    pub suit: Suit,
     pub rank: Rank,
 }
 

@@ -1,4 +1,3 @@
-
 #[derive(PartialEq, PartialOrd, Copy, Clone, Debug)]
 pub enum Suit {
     Clubs,
@@ -47,7 +46,7 @@ impl From<u8> for Rank {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct Card {
     suit: Suit,
     pub rank: Rank,
@@ -59,6 +58,8 @@ impl Card {
     }
 }
 
+// impl Copy for Card {}
+
 // #[derive(Debug)]
 #[derive(PartialEq, PartialOrd, Debug)]
 pub enum PokaVariant {
@@ -67,8 +68,6 @@ pub enum PokaVariant {
     Omaha,
     SevenCardStud,
 }
-
-pub type Hand = [Card; 5];
 
 #[repr(u8)]
 #[derive(PartialEq, PartialOrd, Copy, Clone, Debug)]
@@ -82,6 +81,13 @@ pub enum HandRank {
     FullHouse,
     FourOfAKind,
     StraightFlush,
+}
+
+pub type Hand = [Card; 5];
+
+pub struct Player {
+    id: u8,
+    hand: Hand,
 }
 
 // enum HandRankingResult {

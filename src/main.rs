@@ -37,6 +37,20 @@ fn main() {
         Card::new(Rank::Nine, Suit::Hearts),
         Card::new(Rank::Nine, Suit::Spades),
     ];
+    let hand_straight: Hand = [
+        Card::new(Rank::Jack, Suit::Clubs),
+        Card::new(Rank::Nine, Suit::Clubs),
+        Card::new(Rank::Queen, Suit::Diamonds),
+        Card::new(Rank::Eight, Suit::Hearts),
+        Card::new(Rank::Ten, Suit::Spades),
+    ];
+    let hand_flush: Hand = [
+        Card::new(Rank::Four, Suit::Hearts),
+        Card::new(Rank::Ace, Suit::Hearts),
+        Card::new(Rank::Ten, Suit::Hearts),
+        Card::new(Rank::Jack, Suit::Hearts),
+        Card::new(Rank::Nine, Suit::Hearts),
+    ];
     // println!("{:?} \n{:?}", texas, stud);
     // println!("{:?} ", Card { suit: Suit::} + stud);
     // println!("{:?}",);
@@ -46,6 +60,8 @@ fn main() {
             hand_one_pair,
             hand_two_pair,
             hand_three_of_a_kind,
+            hand_straight,
+            hand_flush,
         ]
         .each_ref(),
     );

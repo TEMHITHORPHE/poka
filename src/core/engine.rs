@@ -1,7 +1,10 @@
+use std::array;
+
 use crate::core::shared::*;
 
-type H
-
+// pub type Hand = &[Card; 5];
+type HandEvaluationResult<'a> = (HandId, &'a Hand, HandRank);
+type HandId = u8;
 
 #[derive(Debug)]
 pub struct PokaEngine {
@@ -13,30 +16,42 @@ impl PokaEngine {
         PokaEngine { variant }
     }
 
-    pub fn evaluate(self, hands: &[Hand]) {
+    pub fn evaluate(self, hands: &[&Hand]) {
         let hands_ranking = match self.variant {
-            PokaVariant::TexasHoldEm => PokaEngine::texas_hold_em(hands),
+            PokaVariant::TexasHoldEm => PokaEngine::texas_hold_em(hands.clone()),
             PokaVariant::Stud => todo!(),
             PokaVariant::Omaha => todo!(),
             PokaVariant::SevenCardStud => todo!(),
         };
     }
 
-    fn texas_hold_em(hands: &[Hand]) -> Vec<HandRank> {
-        let hand_ranks = Vec::<HandRank>::with_capacity(hands.len());
-
+    fn texas_hold_em<'a>(players_hands: &'a [&'a Hand]) -> Vec<HandEvaluationResult<'a>> {
+        let mut hand_ranks = Vec::<HandEvaluationResult>::with_capacity(players_hands.len());
+        print!("Player Hands: {} {}", players_hands.len(), hand_ranks.len());
         let mut hand_rank_freq = [[0_u8, 0_u8], [0, 0], [0, 0], [0, 0], [0, 0]];
-        for (hand_idx, hand) in hands.iter().enumerate() {
+
+        // need a sorted player hand to make certain logic evaluation easier.
+        let mut sorted_players_hand: [Rank; 5] = [Rank::None, Rank::None, Rank::None, Rank::None, Rank::None];
+        print!("Sorted Players Hands: {}", sorted_players_hand.len());
+
+        for (hand_idx, hand) in players_hands.iter().enumerate() {
+            println!("\n==== Card {} ====", hand_idx + 1);
             //
             // ================= ==== ====== Weird Heap Free Implementation ===== ===== ===================
             // preliminary ops
             //
-            // [(Rank, Frequency)]
-            println!("\n==== Card {} ====", hand_idx + 1);
+            sorted_players_hand[0] = hand[0].rank;
+            sorted_players_hand[1] = hand[1].rank;
+            sorted_players_hand[2] = hand[2].rank;
+            sorted_players_hand[3] = hand[3].rank;
+            sorted_players_hand[4] = hand[4].rank;
+            // structure below is just me avoiding to use an hashmap or similar construct (heap avoidance).
+            // [ (Rank, Frequency) ]
             let mut j = 0_usize;
             for card in hand.iter() {
                 let rank = card.rank as u8;
-                println!("|{} as {:?}", rank, Rank::from(rank));
+                // sorted_players_hand[]
+                // code below counts the frequency of occurrence of a card in a particular hand
                 if rank == hand_rank_freq[0][0] {
                     hand_rank_freq[0] = [rank, hand_rank_freq[0][1] + 1];
                 } else if rank == hand_rank_freq[1][0] {
@@ -49,29 +64,63 @@ impl PokaEngine {
                     hand_rank_freq[j] = [rank, 1];
                     j += 1;
                 }
+                println!("|{} as {:?}", rank, Rank::from(rank));
             }
-            hand_rank_freq.sort_by(|arr_one, arr_two| arr_two[1].cmp(&arr_one[1]));
 
-            println!("Card Freq: {:?}", hand_rank_freq);
+            // this allows for easy comparisons and logic evaluation of ranks by frequency.
+            hand_rank_freq.sort_by(|arr_one, arr_two| arr_two[1].cmp(&arr_one[1]));
 
             //
             // [EVALUATE]: HIGH
-            // todo!();
-
+            if hand_rank_freq[0][1] == 1
+                && hand_rank_freq[1][1] == 1
+                && hand_rank_freq[2][1] == 1
+                && hand_rank_freq[3][1] == 1
+                && hand_rank_freq[4][1] == 1
+            {
+                hand_ranks.push((hand_idx as u8, hand, HandRank::High));
+                println!("|\n|=> {:?} ", HandRank::High);
+            }
+            //
+            //
+            // [EVALUATE]: One Pair
+            if hand_rank_freq[0][1] == 2_u8 && hand_rank_freq[1][1] != 2_u8 {
+                hand_ranks.push((hand_idx as u8, hand, HandRank::Pair));
+                println!("|\n|=> {:?} ", HandRank::Pair);
+            }
+            //
+            //
             // [EVALUATE]: Two Pair
             if hand_rank_freq[0][1] == 2_u8 && hand_rank_freq[1][1] == 2_u8 {
-                return hand_ranks[hand_idx] = (hand, HandRank::TwoPair);
+                hand_ranks.push((hand_idx as u8, hand, HandRank::TwoPair));
+                println!("|\n|=> {:?} ", HandRank::TwoPair);
             }
+            //
+            //
+            // [EVALUATE]: Three Of A Kind
+            if hand_rank_freq[0][1] == 3_u8 && hand_rank_freq[1][1] == 1_u8 {
+                hand_ranks.push((hand_idx as u8, hand, HandRank::ThreeOfAKind));
+                println!("|\n|=> {:?} ", HandRank::ThreeOfAKind);
+            }
+            //
+            //
+            // [EVALUATE]: Straight
+            // if hand_rank_freq[0][1] == hand_rank_freq[1][1] == 2_u8 {
+            //     hand_ranks.push((hand_idx as u8, hand, HandRank::Straight));
+            //     println!("|\n|=> {:?} ", HandRank::Straight);
+            // }
 
-            // [EVALUATE]: One Pair
-            // todo!();
+            println!("Card Freq: {:?}", hand_rank_freq);
 
             // We reset our rank/frequency array.
             hand_rank_freq.fill([0_u8, 0_u8]);
         }
 
         return hand_ranks;
+
         // ================= ==== ====== Weird Heap Free Implementation ===== ===== ===================
+        // 
+        // 
         // let mut cards_rank_weight = [
         //     (hand[0].rank as u8),
         //     (hand[1].rank as u8),

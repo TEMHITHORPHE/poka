@@ -85,28 +85,8 @@ pub enum HandRank {
 
 pub type Hand = [Card; 5];
 
-pub struct Player {
-    id: u8,
-    hand: Hand,
-}
 
-// enum HandRankingResult {
-//     StraightFlush(),
-// }
 
-// u8_to_enum: [
-//     Rank::None,
-//     Rank::Deuce,
-//     Rank::Three,
-//     Rank::Four,
-//     Rank::Five,
-//     Rank::Six,
-//     Rank::Seven,
-//     Rank::Eight,
-//     Rank::Nine,
-//     Rank::Ten,
-//     Rank::Jack,
-//     Rank::Queen,
-//     Rank::King,
-//     Rank::Ace,
-// ],
+
+
+// =========== GAMELOOP =============
